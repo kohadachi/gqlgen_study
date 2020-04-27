@@ -9,6 +9,13 @@ type Todo {
   user: User!
 }
 
+type Robot {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
+}
+
 type User {
   id: ID!
   name: String!
@@ -16,6 +23,7 @@ type User {
 
 type Query {
   todos: [Todo!]!
+  robots: [Robot!]!
 }
 
 input NewTodo {
@@ -23,6 +31,12 @@ input NewTodo {
   userId: String!
 }
 
+input NewRobot {
+  text: String!
+  userId: String!
+}
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  createRobot(input: NewRobot!): Robot!
 }

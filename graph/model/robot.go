@@ -2,14 +2,19 @@
 
 package model
 
-type NewTodo struct {
+type NewRobot struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
 }
 
-type Todo struct {
+type Robot struct {
 	ID   string `json:"id"`
 	Text string `json:"text"`
 	Done bool   `json:"done"`
 	User *User  `json:"user"`
+}
+
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }

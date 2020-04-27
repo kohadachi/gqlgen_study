@@ -1,8 +1,6 @@
 package graph
 
-// This file will not be regenerated automatically.
-//
-// It serves as dependency injection for your app, add any dependencies you require here.
+// THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 import (
 	"github.com/kouheiadachi/gqlgen_study/graph/model"
@@ -10,4 +8,5 @@ import (
 
 type Resolver struct{
 	todos []*model.Todo
+	robots []*model.Robot
 }
