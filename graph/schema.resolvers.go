@@ -6,8 +6,10 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/kouheiadachi/gqlgen_study/graph/generated"
 	"github.com/kouheiadachi/gqlgen_study/graph/model"
 )
@@ -32,12 +34,75 @@ func (r *mutationResolver) CreateRobot(ctx context.Context, input model.NewRobot
 	return robot, nil
 }
 
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	db, err := sqlx.Open("mysql", "root@/go")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	tx := db.MustBegin()
+	tx.MustExec(tx.Rebind("INSERT INTO user (name, text) VALUES (?, ?)"), input.Name, input.Text)
+	tx.Commit()
+	user := &model.User{
+		Name: input.Name,
+		ID:   fmt.Sprintf("T%d", rand.Int()),
+	}
+	return user, nil
+}
+
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	db, err := sqlx.Open("mysql", "root@/go")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	tx := db.MustBegin()
+	tx.MustExec(tx.Rebind("UPDATE user SET name=?,text=? WHERE id=?"), input.Name, input.Text, input.ID)
+	tx.Commit()
+	user := &model.User{
+		Name: input.Name,
+		ID:   input.ID,
+	}
+	return user, nil
+}
+
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
 }
 
 func (r *queryResolver) Robots(ctx context.Context) ([]*model.Robot, error) {
 	return r.robots, nil
+}
+
+func (r *queryResolver) User(ctx context.Context, id string) (*model.UserDb, error) {
+	db, err := sqlx.Open("mysql", "root@/go")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	users := []model.UserDb{}
+	err = db.Select(&users, "SELECT * FROM user where id = ?", id)
+
+	user := &model.UserDb{
+		Name: users[0].Name,
+		ID:   users[0].ID,
+	}
+	return user, nil
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.UserDb, error) {
+	db, err := sqlx.Open("mysql", "root@/go")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	users := []model.UserDb{}
+	err = db.Select(&users, "SELECT * FROM user")
+	results := []*model.UserDb{}
+	for _, user := range users {
+		results = append(results, &model.UserDb{
+			Name: user.Name,
+			ID:   user.ID,
+			Text: user.Text,
+		})
+	}
+	return results, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -6,7 +6,8 @@ import (
 	"github.com/kouheiadachi/gqlgen_study/graph/model"
 )
 
-type Resolver struct{
-	todos []*model.Todo
+type Resolver struct {
+	todos  []*model.Todo
 	robots []*model.Robot
+	users  []*model.User
 }
