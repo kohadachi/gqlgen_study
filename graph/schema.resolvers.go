@@ -22,27 +22,12 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
-func (r *mutationResolver) CreateRobot(ctx context.Context, input model.NewRobot) (*model.Robot, error) {
-	robot := &model.Robot{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", rand.Int()),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
-	}
-	r.robots = append(r.robots, robot)
-	return robot, nil
-}
-
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	// db, err := sqlx.Open("mysql", "root@/go")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
 	tx := r.DB.MustBegin()
 	tx.MustExec(tx.Rebind("INSERT INTO user (name, text) VALUES (?, ?)"), input.Name, input.Text)
 	tx.Commit()
 	user := &model.User{
 		Name: input.Name,
-		ID:   fmt.Sprintf("T%d", rand.Int()),
 	}
 	return user, nil
 }
@@ -60,10 +45,6 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUser) 
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
-}
-
-func (r *queryResolver) Robots(ctx context.Context) ([]*model.Robot, error) {
-	return r.robots, nil
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.UserDb, error) {

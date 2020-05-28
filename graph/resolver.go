@@ -8,8 +8,7 @@ import (
 )
 
 type Resolver struct {
-	todos  []*model.Todo
-	robots []*model.Robot
-	users  []*model.User
-	DB     *sqlx.DB
+	todos []*model.Todo
+	users []*model.User
+	DB    *sqlx.DB
 }
