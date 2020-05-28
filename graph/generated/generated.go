@@ -390,7 +390,6 @@ input NewUser {
   name: String!
 }
 
-
 type Mutation {
   createTodo(input: NewTodo!): Todo!
   createRobot(input: NewRobot!): Robot!

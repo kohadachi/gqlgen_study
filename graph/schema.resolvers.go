@@ -6,10 +6,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/kouheiadachi/gqlgen_study/graph/generated"
 	"github.com/kouheiadachi/gqlgen_study/graph/model"
 )
@@ -35,11 +33,11 @@ func (r *mutationResolver) CreateRobot(ctx context.Context, input model.NewRobot
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	db, err := sqlx.Open("mysql", "root@/go")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	tx := db.MustBegin()
+	// db, err := sqlx.Open("mysql", "root@/go")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	tx := r.DB.MustBegin()
 	tx.MustExec(tx.Rebind("INSERT INTO user (name, text) VALUES (?, ?)"), input.Name, input.Text)
 	tx.Commit()
 	user := &model.User{
@@ -50,11 +48,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	db, err := sqlx.Open("mysql", "root@/go")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	tx := db.MustBegin()
+	tx := r.DB.MustBegin()
 	tx.MustExec(tx.Rebind("UPDATE user SET name=?,text=? WHERE id=?"), input.Name, input.Text, input.ID)
 	tx.Commit()
 	user := &model.User{
@@ -73,12 +67,8 @@ func (r *queryResolver) Robots(ctx context.Context) ([]*model.Robot, error) {
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.UserDb, error) {
-	db, err := sqlx.Open("mysql", "root@/go")
-	if err != nil {
-		log.Fatalln(err)
-	}
 	users := []model.UserDb{}
-	err = db.Select(&users, "SELECT * FROM user where id = ?", id)
+	r.DB.Select(&users, "SELECT * FROM user where id = ?", id)
 
 	user := &model.UserDb{
 		Name: users[0].Name,
@@ -88,12 +78,8 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.UserDb, err
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.UserDb, error) {
-	db, err := sqlx.Open("mysql", "root@/go")
-	if err != nil {
-		log.Fatalln(err)
-	}
 	users := []model.UserDb{}
-	err = db.Select(&users, "SELECT * FROM user")
+	r.DB.Select(&users, "SELECT * FROM user")
 	results := []*model.UserDb{}
 	for _, user := range users {
 		results = append(results, &model.UserDb{
