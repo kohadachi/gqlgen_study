@@ -19,8 +19,8 @@ services:
   app:
     build: .
     ports:
-    - "8080:8080"
-    depends_on:
+      - "8080:8080"
+    links:
       - db
     networks:
       - study-graphql-network
